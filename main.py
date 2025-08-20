@@ -1,38 +1,31 @@
-import praw
+import email_utils
+import gemini_utils
 import os
-
-def create_reddit_instance():
-    reddit = praw.Reddit(
-        client_id=os.getenv("CLIENT_ID"),
-        client_secret=os.getenv("CLIENT_SECRET"),
-        user_agent=os.getenv("USER_AGENT"),
-        username=os.getenv("USERNAME"),
-        password=os.getenv("PASSWORD")
-    )
-    return reddit
-
-def get_top_posts(subreddit: str):
-    pass
-
-def summarize_content(posts):
-    pass
+import reddit_utils
+import utils
+from dotenv import load_dotenv
 
 def main():
-    # Authenticate
-    reddit = create_reddit_instance()
-
-    # Get all the subreddits you've joined
+    load_dotenv()
+    API_KEY = os.getenv("GEMINI_API_KEY")
+    reddit = reddit_utils.create_reddit_instance()
     subreddits = reddit.user.subreddits()
 
-    # Some data structure to track each subreddit's summary (to construct email)
+    summaries = []
 
     for subreddit in subreddits:
-        # Take the top X posts in the subreddit
-        top_posts = get_top_posts(subreddit)
-        # Ask Gemini to summarize the content
+        if subreddit.display_name != "announcements":
+            top_posts = reddit_utils.get_top_posts(subreddit)
 
-    # Construct email body
-    # Send email
+            prompt = utils.create_prompt(subreddit.display_name, top_posts)
+
+            response = gemini_utils.call_gemini_api(prompt, API_KEY)
+
+            summaries.append([subreddit.display_name, response])
+
+    # Create and send message
+    email_utils.email(summaries)
+
 
 if __name__ == "__main__":
     main()
