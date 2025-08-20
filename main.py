@@ -1,11 +1,13 @@
 import email_utils
 import gemini_utils
 import os
+import schedule
 import reddit_utils
+import time
 import utils
 from dotenv import load_dotenv
 
-def main():
+def work():
     load_dotenv()
     API_KEY = os.getenv("GEMINI_API_KEY")
     reddit = reddit_utils.create_reddit_instance()
@@ -26,7 +28,9 @@ def main():
     # Create and send message
     email_utils.email(summaries)
 
+schedule.every().day.at("7:00").do(work)
 
-if __name__ == "__main__":
-    main()
+while True:
+    schedule.run_pending()
+    time.sleep(1)
 
