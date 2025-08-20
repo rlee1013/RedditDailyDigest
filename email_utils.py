@@ -7,7 +7,7 @@ def email(summaries):
     smtp_server = "smtp.gmail.com"
     smtp_port = 587
     sender_email = os.getenv("FROM_EMAIL")
-    sender_password = os.getenv("APP_PASSWORD")  # See note below about app passwords
+    sender_password = os.getenv("APP_PASSWORD") 
 
     msg = MIMEMultipart()
     msg['From'] = sender_email
@@ -23,7 +23,7 @@ def email(summaries):
     msg.attach(MIMEText(header + body + footer, 'html'))
     try:
         server = smtplib.SMTP(smtp_server, smtp_port)
-        server.starttls()  # Enable encryption
+        server.starttls() 
         server.login(sender_email, sender_password)
         server.send_message(msg)
         server.quit()
